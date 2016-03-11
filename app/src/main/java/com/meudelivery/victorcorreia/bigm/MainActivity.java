@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<Categoria> listGroup;
     private HashMap<Categoria, List<Item>> listData;
     private ProgressDialog pd = null;
+    private List<Item> itemBd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,101 +91,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         btnPedido.setOnClickListener(this);
 
         //metodo que chama e faz o trabalho no WS
-        this.buildList();
+        boolean success = this.buildList();
 
-        //init expandableListView
-        final ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
-        expandableListView.setAdapter(new ExpandableAdapter(MainActivity.this, listGroup, listData));
-
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-                Intent it = new Intent(MainActivity.this, TelaAddAoPedido.class);
-
-                it.putExtra("IDITEM", (int) id);
-
-                startActivity(it);
-                //Toast.makeText(MainActivity.this, "Group: " + groupPosition + " | Item:" + id, Toast.LENGTH_LONG).show();
-                return false;
-            }
-        });
-
-        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int groupPosition) {
-                //Toast.makeText(MainActivity.this, "Group (Expand): " + groupPosition, Toast.LENGTH_LONG).show();
-            }
-        });
-
-        expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-            @Override
-            public void onGroupCollapse(int groupPosition) {
-                //Toast.makeText(MainActivity.this, "Group (Collapse): " + groupPosition, Toast.LENGTH_LONG).show();
-            }
-        });
-
-    }
-
-    public void buildList() {
-
-        listGroup = new ArrayList<Categoria>();
-        listData = new HashMap<Categoria, List<Item>>();
-        List<Item> itemBd;
-
-        //Categorias
-        AcessoWS acessoWS = new AcessoWS();
-
-        String chamadaWS;
-
-        chamadaWS = "http://webservicevictor.16mb.com/android/get_all_categoria.php";
-
-        String resultado = acessoWS.chamadaGet(chamadaWS);
-
-        try {
-            Gson g = new Gson();
-
-            Type categoriaType = new TypeToken<List<Categoria>>() {
-            }.getType();
-
-            listGroup = (List<Categoria>) g.fromJson(resultado, categoriaType);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast toast = Toast.makeText(this, "Erro", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-
-        //Itens
-        chamadaWS = "http://webservicevictor.16mb.com/android/get_all_item.php";
-
-        resultado = acessoWS.chamadaGet(chamadaWS);
-
-        try {
-            Gson g = new Gson();
-
-            //private List<Item> it;
-
-            Type categoriaType = new TypeToken<List<Item>>() {
-            }.getType();
-
-            itemBd = (List<Item>) g.fromJson(resultado, categoriaType);
-            //itemRealm = (List<ItemRealm>) g.fromJson(resultado, categoriaType);
-
-            for (int i = 0; i < listGroup.size(); i++) {
-
-                List<Item> auxList = new ArrayList<Item>();
-
-                for (int n = 0; n < itemBd.size(); n++) {
-                    //Item
-                    if (itemBd.get(n).getIdCategoria() == i + 1) {
-                        auxList.add(itemBd.get(n));
-                    }
-                }
-                listData.put(listGroup.get(i), auxList);
-            }
-
+        //se tudo der certo inicia a lista if(success == true)
+        if (success){
             //salvar lista
             BDItem bdItem = new BDItem(this);
 
@@ -198,11 +108,118 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 bdItem.inserir(itemBd.get(i));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast toast = Toast.makeText(this, "Erro", Toast.LENGTH_SHORT);
-            toast.show();
+            //init expandableListView
+            final ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
+            expandableListView.setAdapter(new ExpandableAdapter(MainActivity.this, listGroup, listData));
+
+            expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                    Intent it = new Intent(MainActivity.this, TelaAddAoPedido.class);
+
+                    it.putExtra("IDITEM", (int) id);
+
+                    startActivity(it);
+                    //Toast.makeText(MainActivity.this, "Group: " + groupPosition + " | Item:" + id, Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            });
+
+            expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+                @Override
+                public void onGroupExpand(int groupPosition) {
+                    //Toast.makeText(MainActivity.this, "Group (Expand): " + groupPosition, Toast.LENGTH_LONG).show();
+                }
+            });
+
+            expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+                @Override
+                public void onGroupCollapse(int groupPosition) {
+                    //Toast.makeText(MainActivity.this, "Group (Collapse): " + groupPosition, Toast.LENGTH_LONG).show();
+                }
+            });
         }
+
+
+
+
+    }
+
+    public boolean buildList() {
+
+        listGroup = new ArrayList<Categoria>();
+        listData = new HashMap<Categoria, List<Item>>();
+        //variavel para ter a certeza que tudo voltou correto
+        boolean success = false;
+
+
+        //Categorias
+        AcessoWS acessoWS = new AcessoWS();
+
+        String chamadaWS;
+
+        chamadaWS = "http://webservicevictor.16mb.com/android/get_all_categoria.php";
+
+        String resultado = acessoWS.chamadaGet(chamadaWS);
+
+        //prevendo do resultado vir nulo e fazer todo o serviço
+        if (!resultado.isEmpty() || resultado == ""){
+
+            success = true;
+
+            try {
+                Gson g = new Gson();
+
+                Type categoriaType = new TypeToken<List<Categoria>>() {
+                }.getType();
+
+                listGroup = (List<Categoria>) g.fromJson(resultado, categoriaType);
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                success = false;
+
+            }
+
+            //Itens
+            chamadaWS = "http://webservicevictor.16mb.com/android/get_all_item.php";
+
+            resultado = acessoWS.chamadaGet(chamadaWS);
+
+            try {
+                Gson g = new Gson();
+
+                //private List<Item> it;
+
+                Type categoriaType = new TypeToken<List<Item>>() {
+                }.getType();
+
+                itemBd = (List<Item>) g.fromJson(resultado, categoriaType);
+                //itemRealm = (List<ItemRealm>) g.fromJson(resultado, categoriaType);
+
+                for (int i = 0; i < listGroup.size(); i++) {
+
+                    List<Item> auxList = new ArrayList<Item>();
+
+                    for (int n = 0; n < itemBd.size(); n++) {
+                        //Item
+                        if (itemBd.get(n).getIdCategoria() == i + 1) {
+                            auxList.add(itemBd.get(n));
+                        }
+                    }
+                    listData.put(listGroup.get(i), auxList);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                success = false;
+            }
+
+        }
+
+        return success;
 
     }
 
