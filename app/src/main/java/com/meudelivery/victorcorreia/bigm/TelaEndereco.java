@@ -71,11 +71,11 @@ public class TelaEndereco extends AppCompatActivity implements View.OnClickListe
         auxList = bdCliente.buscar();
         cliente = auxList.get(0);
 
-        System.out.println(auxList.get(0).getId());
-        System.out.println(auxList.get(0).getIdFb());
+        /*System.out.println(auxList.get(0).getId());
+        //System.out.println(auxList.get(0).getIdFb());
         System.out.println(auxList.get(0).getNome());
         System.out.println(auxList.get(0).getEmail());
-        System.out.println(auxList.get(0).getFone());
+        System.out.println(auxList.get(0).getFone());*/
 
         BDPedido bdPedido = new BDPedido(this);
         auxListPedido = bdPedido.buscar();

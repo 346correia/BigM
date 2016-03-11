@@ -26,6 +26,7 @@ public class AcessoWS {
 
         HttpGet chamadaget = new HttpGet(url);
         String retorno = "";
+
         // Instantiate a GET HTTP method
         try {
 
@@ -35,10 +36,7 @@ public class AcessoWS {
             StrictMode.setThreadPolicy(policy);
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
-            String responseBody = httpclient.execute(chamadaget,
-                    responseHandler);
-
-            retorno = responseBody;
+            retorno = httpclient.execute(chamadaget, responseHandler);
 
 
         } catch (ClientProtocolException e) {
