@@ -16,14 +16,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.IOException;
 
 public class AcessoWS {
-    private int  TIMEOUT_MILLISEC = 3000;
-
-
+    //private int  TIMEOUT_MILLISEC = 3000;
     // private String[] params;
 
     public String chamadaGet(String url)
     {
-
 
         HttpClient httpclient = new DefaultHttpClient();
 
@@ -31,8 +28,6 @@ public class AcessoWS {
         String retorno = "";
         // Instantiate a GET HTTP method
         try {
-
-
 
             //Aqui o ideal é colocar a requesição assíncrona
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -44,10 +39,6 @@ public class AcessoWS {
                     responseHandler);
 
             retorno = responseBody;
-
-
-
-
 
 
         } catch (ClientProtocolException e) {
@@ -62,7 +53,6 @@ public class AcessoWS {
         }
 
         return retorno;
-
 
     }
 }

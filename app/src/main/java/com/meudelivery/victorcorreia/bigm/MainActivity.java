@@ -33,14 +33,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
     private List<Categoria> listGroup;
     private HashMap<Categoria, List<Item>> listData;
-    private List<Item> itemBd;
-    private List<Cliente> cliente;
-    private Button btnPedido;
-    private TextView txtNomeCliente;
-    private TextView txtEmailCliente;
-    private String nomeCliente;
-    private String emailCliente;
-
     private ProgressDialog pd = null;
 
     @Override
@@ -51,25 +43,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar.setTitle("Big Mengão");
         setSupportActionBar(toolbar);
 
+        //init facebook sdk
         FacebookSdk.sdkInitialize(getApplicationContext());
 
+        //init drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //navigationView.getMenu().findItem(R.id.nav_entrar).setVisible(false);
-
         View header = navigationView.getHeaderView(0);
 
-        txtNomeCliente = (TextView) header.findViewById(R.id.txtNomeCliente);
-        txtEmailCliente = (TextView) header.findViewById(R.id.txtEmailCliente);
+        //init itens de layout e logica do Victor
+        TextView txtNomeCliente = (TextView) header.findViewById(R.id.txtNomeCliente);
+        TextView txtEmailCliente = (TextView) header.findViewById(R.id.txtEmailCliente);
 
         BDCliente bdCliente = new BDCliente(this);
+        List<Cliente> cliente;
         cliente = bdCliente.buscar();
 
         if (cliente.isEmpty()) {
@@ -79,8 +73,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             navigationView.getMenu().findItem(R.id.nav_entrar).setVisible(false);
 
-            nomeCliente = cliente.get(0).getNome();
-            emailCliente = cliente.get(0).getEmail();
+            String nomeCliente = cliente.get(0).getNome();
+            String emailCliente = cliente.get(0).getEmail();
 
             txtNomeCliente.setText(nomeCliente);
             txtEmailCliente.setText(emailCliente);
@@ -90,26 +84,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.getMenu().findItem(R.id.nav_fale).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_politica).setVisible(false);
 
-        btnPedido = (Button) findViewById(R.id.btnPedido);
+
+        Button btnPedido = (Button) findViewById(R.id.btnPedido);
 
         btnPedido.setOnClickListener(this);
 
-        buildList();
+        //metodo que chama e faz o trabalho no WS
+        this.buildList();
 
-        //salvar lista
-        BDItem bdItem = new BDItem(this);
-
-        BDItemCore auxBd = new BDItemCore(this);
-
-        SQLiteDatabase db = auxBd.getWritableDatabase();
-        db.execSQL("DELETE FROM item"); //delete all rows in a table
-        //db.close();
-
-        for (int i = 0; i < itemBd.size(); i++) {
-            bdItem.inserir(itemBd.get(i));
-        }
-
-
+        //init expandableListView
         final ExpandableListView expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
         expandableListView.setAdapter(new ExpandableAdapter(MainActivity.this, listGroup, listData));
 
@@ -147,15 +130,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         listGroup = new ArrayList<Categoria>();
         listData = new HashMap<Categoria, List<Item>>();
+        List<Item> itemBd;
 
         //Categorias
-        AcessoWS ar = new AcessoWS();
+        AcessoWS acessoWS = new AcessoWS();
 
         String chamadaWS;
 
         chamadaWS = "http://webservicevictor.16mb.com/android/get_all_categoria.php";
 
-        String resultado = ar.chamadaGet(chamadaWS);
+        String resultado = acessoWS.chamadaGet(chamadaWS);
 
         try {
             Gson g = new Gson();
@@ -175,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Itens
         chamadaWS = "http://webservicevictor.16mb.com/android/get_all_item.php";
 
-        resultado = ar.chamadaGet(chamadaWS);
+        resultado = acessoWS.chamadaGet(chamadaWS);
 
         try {
             Gson g = new Gson();
@@ -199,6 +183,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
                 listData.put(listGroup.get(i), auxList);
+            }
+
+            //salvar lista
+            BDItem bdItem = new BDItem(this);
+
+            BDItemCore auxBd = new BDItemCore(this);
+
+            SQLiteDatabase db = auxBd.getWritableDatabase();
+            db.execSQL("DELETE FROM item"); //delete all rows in a table
+            //db.close();
+
+            for (int i = 0; i < itemBd.size(); i++) {
+                bdItem.inserir(itemBd.get(i));
             }
 
         } catch (Exception e) {
