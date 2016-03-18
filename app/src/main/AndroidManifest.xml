@@ -44,12 +44,6 @@
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
-            android:name=".Login"
-            android:label="@string/title_activity_login"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
-        <activity
             android:name="com.meudelivery.victorcorreia.bigm.TelaLogin"
             android:label="@string/title_activity_tela_login"
             android:windowSoftInputMode="stateHidden"
