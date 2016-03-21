@@ -32,7 +32,7 @@ public class AcessoWS {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }*/
 
-    public String chamadaGet(String url)
+    public String chamadaGet(String url, boolean connectionIsAvaliable)
     {
 
         HttpClient httpclient = new DefaultHttpClient();
@@ -67,13 +67,13 @@ public class AcessoWS {
 
     }
 
-    public void startTimer(String url)
+    public void startTimer(String url, boolean connectionIsAvaliable)
     {
         //set a new Timer
         timer = new Timer();
 
         //initialize the TimerTask's job
-        initializeTimerTask(url);
+        initializeTimerTask(url, connectionIsAvaliable );
 
         //schedule the timer, after the first 5000ms the TimerTask will run every 10000ms
         timer.schedule(timerTask, 3000, 3000); //
@@ -87,13 +87,15 @@ public class AcessoWS {
         }
     }
 
-    public void initializeTimerTask(final String url) {
+    public void initializeTimerTask(final String url, final boolean connectionIsAvaliable) {
 
         timerTask = new TimerTask() {
             public void run() {
-                String resultado = chamadaGet(url);
-                if (resultado.isEmpty() || resultado == "") {
+                String resultado = chamadaGet(url, connectionIsAvaliable);
+                if (resultado.isEmpty() || resultado == "" || connectionIsAvaliable == false) {
+                    Log.d("DEBUGTIMER","cancelando chamadaWS da URL:"+ url);
                     timer.cancel();
+
                 }
             }
         };

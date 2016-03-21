@@ -1,6 +1,9 @@
 package com.meudelivery.victorcorreia.bigm;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +27,12 @@ public class TelaLogin extends AppCompatActivity  {
     private EditText edtSenha;
     private String email;
     private String senha;
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +102,7 @@ public class TelaLogin extends AppCompatActivity  {
 
         chamadaWS = "http://webservicevictor.16mb.com/android/get_all_cliente.php";
 
-        String resultado = ar.chamadaGet(chamadaWS);
+        String resultado = ar.chamadaGet(chamadaWS, isNetworkAvailable());
 
         try {
             Gson g = new Gson();

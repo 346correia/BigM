@@ -1,8 +1,11 @@
 package com.meudelivery.victorcorreia.bigm;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,10 +21,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +44,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TimerTask timerTask;
     //we are going to use a handler to be able to run in our TimerTask
     final Handler handler = new Handler();
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         chamadaWS = "http://webservicevictor.16mb.com/android/get_all_categoria.php";
 
-        String resultado = acessoWS.chamadaGet(chamadaWS);
+        String resultado = acessoWS.chamadaGet(chamadaWS, isNetworkAvailable());
 
         //prevendo do resultado vir nulo e fazer todo o serviço
         if (!resultado.isEmpty() || resultado == ""){
@@ -190,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //Itens
             chamadaWS = "http://webservicevictor.16mb.com/android/get_all_item.php";
 
-            resultado = acessoWS.chamadaGet(chamadaWS);
+            resultado = acessoWS.chamadaGet(chamadaWS, isNetworkAvailable());
 
             try {
                 Gson g = new Gson();

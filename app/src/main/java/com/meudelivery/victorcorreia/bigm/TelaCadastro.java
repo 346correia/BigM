@@ -1,8 +1,11 @@
 package com.meudelivery.victorcorreia.bigm;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +41,12 @@ public class TelaCadastro extends AppCompatActivity implements View.OnClickListe
     private List<Cliente> auxList;
     private Cliente cliente = new Cliente();
     private String ultimaTela = new String();
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,7 +171,7 @@ public class TelaCadastro extends AppCompatActivity implements View.OnClickListe
 
         chamadaWS = "http://webservicevictor.16mb.com/android/get_all_cliente.php";
 
-        String resultado = ar.chamadaGet(chamadaWS);
+        String resultado = ar.chamadaGet(chamadaWS,isNetworkAvailable());
 
         try {
             Gson g = new Gson();

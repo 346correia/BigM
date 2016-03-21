@@ -1,6 +1,9 @@
 package com.meudelivery.victorcorreia.bigm;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +38,13 @@ public class TelaLoginFragment extends Fragment {
     private List<Cliente> auxListCliente;
     private ProfileTracker mProfileTracker;
     private CallbackManager mCallbackManager;
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
     private FacebookCallback<LoginResult> mCallback = new FacebookCallback<LoginResult>() {
         @Override
         public void onSuccess(LoginResult loginResult) {
@@ -163,7 +173,7 @@ public class TelaLoginFragment extends Fragment {
 
        chamadaWS = "http://webservicevictor.16mb.com/android/get_all_cliente.php";
 
-       String resultado = ar.chamadaGet(chamadaWS);
+       String resultado = ar.chamadaGet(chamadaWS, isNetworkAvailable());
 
        try {
            Gson g = new Gson();
